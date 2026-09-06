@@ -49,7 +49,7 @@ if [ -n "$SEVERITIES" ]; then
   SEV_ARGS=(--severity $SEVERITIES)
 fi
 
-PROWLER_IMAGE="${PROWLER_IMAGE:-prowlercloud/prowler:stable}"
+PROWLER_IMAGE="${PROWLER_IMAGE:-prowlercloud/prowler:latest}"
 echo ">> Pulling $PROWLER_IMAGE ..."
 docker pull "$PROWLER_IMAGE" || echo "(pull failed — using cached image if present)"
 

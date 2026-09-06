@@ -28,7 +28,7 @@ user picks, and (on confirmation) create remediation tickets in the Jira **VM** 
 
 ## Step 2 — Run the audit
 
-Run the bundled script — it pulls the **latest stable** Prowler image, injects short-lived
+Run the bundled script — it pulls the **latest** official Prowler image fresh each run, injects short-lived
 credentials via `aws configure export-credentials` (works with SSO/MFA/assumed roles; falls
 back to mounting `~/.aws` read-only), runs the scan, and prints a severity summary.
 Your shell's cwd is NOT this skill's folder — invoke it by full path:
@@ -40,16 +40,16 @@ bash "<this-skill-dir>/scripts/audit.sh" -p <profile> [-r "eu-west-1 us-east-1" 
 Reports always go under `~/aws-audit/<account-id>_REPORT_<datetime>/` (created automatically):
 `.csv`, `.ocsf.json`, and `.html`, plus per-framework compliance CSVs under `compliance/`.
 
-Env override: `PROWLER_IMAGE=<image:tag>` (default `prowlercloud/prowler:stable`).
+Env override: `PROWLER_IMAGE=<image:tag>` (default `prowlercloud/prowler:latest`).
 
 Or run manually with Docker:
 
 ```bash
-docker pull prowlercloud/prowler:stable
+docker pull prowlercloud/prowler:latest
 docker run --rm \
   $(aws configure export-credentials --profile <profile> --format env-no-export | sed 's/^/-e /') \
   -v "<output-dir>:/home/prowler/output" \
-  prowlercloud/prowler:stable aws \
+  prowlercloud/prowler:latest aws \
   -f eu-west-1 us-east-1 \
   -M csv json-ocsf html \
   -z

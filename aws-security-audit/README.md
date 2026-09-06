@@ -8,7 +8,7 @@ ones** — and can file remediation tickets in the Jira **VM** project.
 
 1. **Asks for scope first**: AWS profile, all regions vs. specific ones, optional severity
    filter — and shows you the account identity (`aws sts get-caller-identity`) before scanning.
-2. Pulls the **latest stable** official Prowler Docker image (`prowlercloud/prowler:stable`)
+2. Always pulls the **latest** official Prowler Docker image (`prowlercloud/prowler:latest`)
    and runs the full check suite (or your severity/compliance subset).
 3. Writes reports under `~/aws-audit/<account-id>_REPORT_<datetime>/` — CSV, OCSF JSON, and
    HTML, plus per-framework compliance CSVs — and prints FAIL counts by severity.
@@ -55,7 +55,7 @@ bash aws-security-audit/scripts/audit.sh -p <profile> [-r "eu-west-1 us-east-1" 
 | `-p <profile>` | `$AWS_PROFILE` or `default` | AWS profile to scan with |
 | `-r <regions>` | `all` | Space-separated region list, or `all` |
 | `-s <severities>` | all | e.g. `"critical high"` |
-| `PROWLER_IMAGE` | `prowlercloud/prowler:stable` | Pin a specific image/tag |
+| `PROWLER_IMAGE` | `prowlercloud/prowler:latest` | Pin a specific image/tag |
 
 Credentials are injected as short-lived env vars via `aws configure export-credentials`
 (SSO/MFA/assume-role friendly); if that's unavailable, `~/.aws` is mounted read-only.
@@ -63,6 +63,8 @@ Credentials are injected as short-lived env vars via `aws configure export-crede
 ## Notes
 
 - Prowler exits 3 when checks fail; the script passes `-z` so findings don't read as errors.
+- `:latest` tracks Prowler's master branch; if a run misbehaves, pin a release with
+  `PROWLER_IMAGE=prowlercloud/prowler:stable` (newest tagged release) or a specific version.
 - SSO profiles: run `aws sso login --profile <p>` before auditing.
 - Reports contain account IDs and resource ARNs — keep them out of git.
 
