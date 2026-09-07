@@ -42,14 +42,18 @@ echo ">> Pulling $DNSREAPER_IMAGE ..."
 docker pull "$DNSREAPER_IMAGE" || echo "(pull failed — using cached image if present)"
 
 echo ">> Running dnsReaper (passive takeover fingerprinting)..."
-# container workdir is /etc/dnsreaper; mount output dir there for input + results
+# container workdir is /etc/dnsreaper; mount output dir there for the input file.
+# dnsReaper writes findings only (empty output when none), so stream JSON to stdout
+# and normalize; progress/banner goes to a log.
+DR_JSON="$OUT/dnsreaper-results.json"
 docker run --rm -v "$OUT:/etc/dnsreaper" "$DNSREAPER_IMAGE" \
   file --filename /etc/dnsreaper/domains.txt \
-  --out /etc/dnsreaper/dnsreaper-results --out-format json || true
+  --out stdout --out-format json \
+  > "$DR_JSON" 2> "$OUT/dnsreaper.log" || true
+# normalize empty / non-JSON (no findings) to an empty array
+jq -e . "$DR_JSON" >/dev/null 2>&1 || echo '[]' > "$DR_JSON"
 
-DR_JSON="$OUT/dnsreaper-results.json"
-DR_COUNT=0
-[ -s "$DR_JSON" ] && DR_COUNT=$(jq 'length' "$DR_JSON" 2>/dev/null || echo 0)
+DR_COUNT=$(jq 'length' "$DR_JSON" 2>/dev/null || echo 0)
 echo ">> dnsReaper findings: $DR_COUNT"
 
 NUCLEI_COUNT=0
