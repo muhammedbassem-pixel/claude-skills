@@ -44,6 +44,7 @@ echo ">> Running Semgrep SAST (OWASP Top 10 + CWE Top 25)..."
 docker run --rm \
   -u "$(id -u):$(id -g)" \
   -e SEMGREP_SEND_METRICS=off \
+  -e HOME=/tmp \
   -v "$SRC:/src:ro" \
   -v "$OUT:/out" \
   "$SEMGREP_IMAGE" semgrep scan \
@@ -55,6 +56,7 @@ docker run --rm \
 docker run --rm \
   -u "$(id -u):$(id -g)" \
   -e SEMGREP_SEND_METRICS=off \
+  -e HOME=/tmp \
   -v "$SRC:/src:ro" \
   -v "$OUT:/out" \
   "$SEMGREP_IMAGE" semgrep scan \
