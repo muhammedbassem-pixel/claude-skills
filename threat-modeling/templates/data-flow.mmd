@@ -1,0 +1,19 @@
+%% Data Flow Diagram — external entities, processes, data stores, flows, trust boundaries.
+%% Subgraphs represent trust boundaries. Label flows with protocol + auth.
+flowchart LR
+    subgraph internet[Trust Boundary: Internet]
+        user([External Entity: User])
+    end
+    subgraph edgetz[Trust Boundary: Edge]
+        gw[Process: API Gateway]
+    end
+    subgraph apptz[Trust Boundary: Internal Network]
+        api[Process: Backend Service]
+    end
+    subgraph datatz[Trust Boundary: Restricted]
+        db[(Data Store: Database)]
+    end
+
+    user -->|HTTPS / JWT / Confidential| gw
+    gw -->|mTLS / Internal| api
+    api -->|TLS / IAM / Restricted| db

@@ -1,0 +1,26 @@
+{
+  "version": "2.6.2",
+  "summary": {
+    "title": "__APP_NAME__ Threat Model",
+    "owner": "",
+    "description": "STRIDE threat model for __APP_NAME__. See threat-model.md for scope and threat-register.md for the full register.",
+    "id": 0
+  },
+  "detail": {
+    "contributors": [],
+    "diagramTop": 1,
+    "threatTop": 0,
+    "reviewer": "",
+    "diagrams": [
+      {
+        "id": 0,
+        "title": "__APP_NAME__ — STRIDE",
+        "diagramType": "STRIDE",
+        "placeholder": "__APP_NAME__ data-flow diagram",
+        "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+        "version": "2.6.2",
+        "cells": []
+      }
+    ]
+  }
+}

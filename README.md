@@ -14,6 +14,7 @@ timestamped reports under your home directory, and can file findings as Jira tic
 | [`amass-recon`](amass-recon/) | External perimeter recon / subdomain enumeration | OWASP Amass (`owaspamass/amass`) |
 | [`dns-takeover-scan`](dns-takeover-scan/) | Subdomain-takeover detection (pairs with amass output) | dnsReaper + nuclei |
 | [`secure-code-review`](secure-code-review/) | Multi-language SAST mapped to OWASP Top 10 + CWE/SANS Top 25 | Semgrep (`semgrep/semgrep`) + `dart analyze` |
+| [`threat-modeling`](threat-modeling/) | STRIDE threat modeling: scope, DFD, trust boundaries, threat/risk registers | OWASP Threat Dragon (`owasp/threat-dragon`) |
 
 Each skill has its own `README.md` with detailed usage and options.
 
@@ -75,6 +76,7 @@ Additionally, per skill:
 - `aws-security-audit` — AWS CLI v2 + credentials with `SecurityAudit` and
   `job-function/ViewOnlyAccess` policies
 - `secure-code-review` — no extra tools (Flutter reviews also use the `dart` image)
+- `threat-modeling` — `openssl` (to generate Threat Dragon local-session keys)
 
 **Jira ticket creation** (optional, all skills) needs either the Atlassian (Rovo) MCP
 connector enabled in Claude, or these env vars for the REST fallback:

@@ -1,0 +1,28 @@
+%% Architecture diagram — components, external systems, trust zones, communication paths.
+%% Replace placeholders. Keep to architecture level (no code-level detail).
+flowchart LR
+    user([End User]):::ext
+    subgraph edge[Edge / DMZ]
+        waf[WAF / CDN]
+        gw[API Gateway]
+    end
+    subgraph internal[Internal Network]
+        api[Backend Service]
+        worker[Worker]
+    end
+    subgraph data[Restricted]
+        db[(PostgreSQL)]
+        secrets[(Secrets Manager)]
+    end
+    idp([Identity Provider]):::ext
+    thirdparty([Third-party API]):::ext
+
+    user -->|HTTPS| waf --> gw
+    gw -->|OIDC| idp
+    gw -->|HTTPS/mTLS| api
+    api --> db
+    api --> secrets
+    api -->|HTTPS| thirdparty
+    api --> worker
+
+    classDef ext fill:#eee,stroke:#999,stroke-dasharray:4 4;
