@@ -13,7 +13,7 @@ timestamped reports under your home directory, and can file findings as Jira tic
 | [`aws-security-audit`](aws-security-audit/) | AWS security posture audit across all/specific regions | Prowler (`prowlercloud/prowler`) |
 | [`amass-recon`](amass-recon/) | External perimeter recon / subdomain enumeration | OWASP Amass (`owaspamass/amass`) |
 | [`dns-takeover-scan`](dns-takeover-scan/) | Subdomain-takeover detection (pairs with amass output) | dnsReaper + nuclei |
-| [`secure-code-review`](secure-code-review/) | Multi-language SAST mapped to OWASP Top 10 + CWE/SANS Top 25 | Semgrep (`semgrep/semgrep`) + `dart analyze` |
+| [`secure-code-review`](secure-code-review/) | Multi-language SAST (single repo or every repo in an org) mapped to OWASP Top 10 + CWE/SANS Top 25, with ticket-ready findings per repo | Semgrep (`semgrep/semgrep`) + `dart analyze` |
 | [`threat-modeling`](threat-modeling/) | STRIDE threat modeling: scope, DFD, trust boundaries, threat/risk registers | OWASP Threat Dragon (`owasp/threat-dragon`) |
 
 Each skill has its own `README.md` with detailed usage and options.
@@ -61,8 +61,8 @@ ln -sfn "$(pwd)/secure-code-review" /path/to/project/.claude/skills/secure-code-
 ### Verify
 
 Start Claude Code and run `/skills` (or `/help`) to confirm the skills are listed. You can also
-just ask, e.g. *"scan this repo for secrets"* or *"audit my AWS account"*, and Claude will pick
-up the matching skill.
+just ask, e.g. *"scan this repo for secrets"*, *"audit my AWS account"*, or *"pull all our org
+repos and scan them one by one"*, and Claude will pick up the matching skill.
 
 ## Requirements
 
@@ -75,7 +75,8 @@ Additionally, per skill:
 
 - `aws-security-audit` — AWS CLI v2 + credentials with `SecurityAudit` and
   `job-function/ViewOnlyAccess` policies
-- `secure-code-review` — no extra tools (Flutter reviews also use the `dart` image)
+- `secure-code-review` — Flutter reviews also use the `dart` image; org-wide scans need
+  `git`, plus `gh` (authenticated) to enumerate a GitHub org (or a clone-URL file for any host)
 - `threat-modeling` — `openssl` (to generate Threat Dragon local-session keys)
 
 **Jira ticket creation** (optional, all skills) needs either the Atlassian (Rovo) MCP
