@@ -51,7 +51,7 @@ cp "$TEMPLATES/architecture.mmd" "$TEMPLATES/data-flow.mmd" \
 sed "s/__APP_NAME__/$APP/g" "$TEMPLATES/threat-dragon.json" > "$DEST/threat-dragon.json"
 
 echo ">> Created threat model scaffold at $DEST:"
-ls -1 "$DEST" | sed 's/^/   /'
+for f in "$DEST"/*; do [ -e "$f" ] && echo "   ${f##*/}"; done
 echo
 echo "Next:"
 echo "  1) Fill in README.md, architecture.mmd, data-flow.mmd (see references/methodology.md)."

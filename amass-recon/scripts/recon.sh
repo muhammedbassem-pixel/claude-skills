@@ -92,4 +92,4 @@ MD="$OUT/amass-report.md"
 echo
 echo ">> $COUNT subdomain(s) discovered."
 echo ">> Reports written to $OUT:"
-ls -1 "$OUT" | sed 's/^/   /'
+for f in "$OUT"/*; do [ -e "$f" ] && echo "   ${f##*/}"; done

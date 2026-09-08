@@ -79,4 +79,4 @@ fi
 
 echo
 echo ">> Reports written to $OUT:"
-ls -1 "$OUT" | sed 's/^/   /'
+for f in "$OUT"/*; do [ -e "$f" ] && echo "   ${f##*/}"; done

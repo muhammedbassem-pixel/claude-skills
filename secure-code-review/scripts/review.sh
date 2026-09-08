@@ -113,13 +113,14 @@ else
   echo '[]' > "$FINDINGS_JSON"
 fi
 
+f_total=$(jq 'length' "$FINDINGS_JSON" 2>/dev/null || echo 0)
+f_err=$(jq '[.[]|select(.severity=="ERROR")]|length' "$FINDINGS_JSON" 2>/dev/null || echo 0)
+f_wrn=$(jq '[.[]|select(.severity=="WARNING")]|length' "$FINDINGS_JSON" 2>/dev/null || echo 0)
+f_inf=$(jq '[.[]|select(.severity=="INFO")]|length' "$FINDINGS_JSON" 2>/dev/null || echo 0)
 {
   echo "# Findings — $REPO_NAME"
   echo
-  echo "Total: $(jq 'length' "$FINDINGS_JSON" 2>/dev/null || echo 0) "
-  echo "(ERROR: $(jq '[.[]|select(.severity=="ERROR")]|length' "$FINDINGS_JSON" 2>/dev/null || echo 0), "\
-"WARNING: $(jq '[.[]|select(.severity=="WARNING")]|length' "$FINDINGS_JSON" 2>/dev/null || echo 0), "\
-"INFO: $(jq '[.[]|select(.severity=="INFO")]|length' "$FINDINGS_JSON" 2>/dev/null || echo 0))"
+  echo "Total: $f_total (ERROR: $f_err, WARNING: $f_wrn, INFO: $f_inf)"
   echo
   echo "| Severity | Rule | File:Line | OWASP / CWE | Message |"
   echo "|----------|------|-----------|-------------|---------|"
@@ -129,4 +130,4 @@ fi
 
 echo
 echo ">> Reports written to $OUT:"
-ls -1 "$OUT" | sed 's/^/   /'
+for f in "$OUT"/*; do [ -e "$f" ] && echo "   ${f##*/}"; done

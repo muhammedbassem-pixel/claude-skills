@@ -37,7 +37,7 @@ declare -a URLS
 if [ -n "$URLS_FILE" ]; then
   LABEL="$(basename "$URLS_FILE" | sed 's/\.[^.]*$//')"
   while IFS= read -r line; do
-    line="$(echo "$line" | sed 's/[[:space:]]//g')"
+    line="$(printf '%s' "$line" | tr -d '[:space:]')"
     [ -n "$line" ] && [ "${line#\#}" = "$line" ] && URLS+=("$line")
   done < "$URLS_FILE"
 else

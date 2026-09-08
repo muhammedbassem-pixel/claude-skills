@@ -90,7 +90,7 @@ cell() {
   echo "- **Rules triggered:** $(jq -r '[.[].RuleID] | unique | join(", ")' "$JSON")"
   echo
   echo "> Secrets are intentionally **unredacted** for rotation. Do not commit this file."
-  echo "> Table cells escape backticks as ´ and newlines as \\n; exact raw values are in the"
+  printf '%s\n' "> Table cells escape backticks as Â´ and newlines as \\n; exact raw values are in the"
   echo "> JSON report and the fenced blocks under *Full finding details*."
   echo
   echo "| # | Rule | Secret | File | Lines | Commit | Branches | Live@HEAD | Author | Date |"
