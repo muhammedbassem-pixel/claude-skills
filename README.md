@@ -2,8 +2,8 @@
 
 A collection of security-focused [Claude Code](https://claude.com/claude-code) skills. Each
 skill runs its tooling from an official Docker image, prompts for scope before scanning, writes
-timestamped reports under your home directory, and can file findings as Jira tickets in the
-**VM** project.
+timestamped reports under your home directory, fans out subagents to work independent findings
+in parallel, and can file findings as Jira tickets in the **VM** project.
 
 ## Skills
 
@@ -24,6 +24,14 @@ A Claude Code skill is a folder containing a `SKILL.md` (a workflow Claude follo
 YAML frontmatter describing when to use it) plus any supporting scripts and references. When
 you ask Claude something matching a skill's description, it loads that skill and follows its
 steps. See the [skills documentation](https://docs.claude.com/en/docs/claude-code/skills).
+
+## Parallel execution
+
+Every skill instructs Claude to **fan out subagents** for the independent work it produces —
+per repository (org code review), per domain (recon / takeover), per account or severity tier
+(AWS audit), per secret (gitleaks), per component or threat (threat modeling) — then aggregate
+the results. The one step never parallelized is **Jira ticket creation**: a single agent files
+tickets after your confirmation, so the same finding can't spawn duplicate tickets.
 
 ## Installation
 
