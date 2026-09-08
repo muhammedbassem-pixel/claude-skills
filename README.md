@@ -18,6 +18,7 @@ in parallel, and can file findings as Jira tickets in the **VM** project.
 | [`image-scan`](image-scan/) | Scan a container image for CVEs, then migrate it to a distroless base and push to ECR | Trivy (`aquasec/trivy`) + distroless |
 | [`k8s-config-scan`](k8s-config-scan/) | K8s manifest/Helm/kustomize best-practice scan + live-cluster CIS & attack-path hunt | Trivy + kube-linter + kube-bench + KubeHound |
 | [`threat-hunting`](threat-hunting/) | Hunt malicious/vulnerable deps, look up threat intel, and scan logs for IoCs | OSV-Scanner + GuardDog + abuse.ch + iocextract |
+| [`sca`](sca/) | Software Composition Analysis: SBOM + dependency vulnerabilities + license risk | Trivy + OSV-Scanner |
 
 Each skill has its own `README.md` with detailed usage and options.
 
@@ -33,7 +34,7 @@ steps. See the [skills documentation](https://docs.claude.com/en/docs/claude-cod
 Every skill instructs Claude to **fan out subagents** for the independent work it produces —
 per repository (org code review), per domain (recon / takeover), per account or severity tier
 (AWS audit), per secret (gitleaks), per component or threat (threat modeling), per CVE (image
-scan), per scanner or workload (k8s), per surface or package (threat hunting) — then aggregate
+scan), per scanner or workload (k8s), per surface or package (threat hunting), per module or severity (SCA) — then aggregate
 the results. The one step never parallelized is **Jira ticket creation**: a single agent files
 tickets after your confirmation, so the same finding can't spawn duplicate tickets.
 
@@ -108,7 +109,7 @@ export JIRA_API_TOKEN="…"   # https://id.atlassian.com/manage-profile/security
 
 - Reports are written outside any scanned repo (under `~/gitleaks/`, `~/aws-audit/`,
   `~/amass-recon/`, `~/dns-takeover/`, `~/code-review/`, `~/image-scan/`, `~/k8s-scan/`,
-  `~/threat-hunting/`) so unredacted secrets and findings can't be committed by accident. Treat
+  `~/threat-hunting/`, `~/sca/`) so unredacted secrets and findings can't be committed by accident. Treat
   them like credentials — don't commit or share them.
 - The recon/scanning/cluster skills (`amass-recon`, `dns-takeover-scan`, and the live-cluster
   hunt in `k8s-config-scan`) probe external targets or live infrastructure. Only scan domains,
