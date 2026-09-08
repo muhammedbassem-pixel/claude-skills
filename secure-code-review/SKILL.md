@@ -13,6 +13,18 @@ tickets in the **VM** project.
 Read `references/checklist.md` (in this skill's directory) for the full category-by-category
 and per-language review guide — use it to drive the manual pass.
 
+## Parallelize with subagents
+
+Fan out subagents (launch several in ONE message) for independent work, then aggregate:
+- for an **org scan**, triage repos in parallel — each subagent takes one repo's `findings.json`,
+  confirms true/false positives by reading the flagged code, and drafts ticket content; merge
+  their results back per repo. (For a very large org, split the clone-URL file into chunks and
+  give each subagent a chunk to run `scan-org.sh -f <chunk>` on.)
+- for a **single large codebase**, one subagent per language/area or per severity tier to triage.
+
+Do **not** fan out the Jira ticket-creation step — one agent files tickets after your
+confirmation, so a finding can't spawn duplicate tickets.
+
 ## Step 1 — Ask for scope, then verify preconditions
 
 1. **Ask the user what to review** (AskUserQuestion or a direct question):

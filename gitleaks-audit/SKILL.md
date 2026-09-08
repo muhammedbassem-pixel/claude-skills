@@ -8,6 +8,16 @@ description: Run a full-history gitleaks secret scan across ALL branches and com
 Scan every commit on every branch of the target repository with gitleaks, build a complete
 unredacted report, and (on confirmation) create remediation tickets in the Jira **VM** project.
 
+## Parallelize with subagents
+
+When the scan returns **many findings**, fan out subagents (launch several in ONE message) to
+work them in parallel, then aggregate:
+- one subagent per unique secret (or a batch of them) to confirm whether it is still live vs.
+  already rotated, identify the owning service/system, and draft the rotation-ticket content.
+
+Do **not** fan out the Jira ticket-creation step — a single agent creates tickets after your
+confirmation, so the same secret can't spawn duplicate tickets.
+
 ## Step 1 — Preconditions
 
 1. **Always ask the user for the repo path on disk before scanning** (use AskUserQuestion or

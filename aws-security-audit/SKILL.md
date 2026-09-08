@@ -9,6 +9,16 @@ Audit an AWS account's security posture with [Prowler](https://github.com/prowle
 run from its official Docker image, covering **all regions by default** or only the regions the
 user picks, and (on confirmation) create remediation tickets in the Jira **VM** project.
 
+## Parallelize with subagents
+
+Fan out subagents (launch several in ONE message) for independent work, then aggregate:
+- for a **large multi-account scope**, one subagent per account/profile to run the audit;
+- to triage results, one subagent per severity tier or service group (IAM, S3, networking, …)
+  to verify FAILed checks and draft remediation content.
+
+Do **not** fan out the Jira ticket-creation step — one agent files tickets after your
+confirmation to avoid duplicates.
+
 ## Step 1 — Ask for scope, then verify preconditions
 
 1. **Ask the user before scanning** (AskUserQuestion or a direct question):

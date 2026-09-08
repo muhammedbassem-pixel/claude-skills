@@ -16,6 +16,16 @@ takeover templates for active confirmation. On confirmation, file tickets in the
 
 This pairs well with `amass-recon`: feed its `subdomains.txt` in as the target list.
 
+## Parallelize with subagents
+
+Fan out subagents (launch several in ONE message) for independent work, then aggregate:
+- split a **large domain list** into chunks, one subagent per chunk to scan and triage;
+- one subagent per confirmed takeover to gather evidence (the dangling record, the claimable
+  service) and draft the ticket content.
+
+Do **not** fan out the Jira ticket-creation step — one agent files tickets after your
+confirmation to avoid duplicate takeover tickets.
+
 ## Step 1 — Ask for scope, then verify preconditions
 
 1. **Ask the user before scanning**:

@@ -13,6 +13,17 @@ follow it throughout.
 The companion framework repo (methodology, standards, and real Threat Dragon examples) lives at
 `CyberDefense-ThreatModeling/`; point the user there for org standards and reference models.
 
+## Parallelize with subagents
+
+Fan out subagents (launch several in ONE message) for independent work, then merge into the
+registers:
+- one subagent per **component / trust-boundary** to run STRIDE and propose threats with
+  likelihood/impact;
+- one subagent per **High/Critical threat** to draft the remediation-ticket content.
+
+Do **not** fan out the Jira ticket-creation step — one agent files tickets after your
+confirmation to avoid duplicates.
+
 ## Step 1 — Scope the system (ask the user)
 
 Gather before modeling (AskUserQuestion or direct questions):

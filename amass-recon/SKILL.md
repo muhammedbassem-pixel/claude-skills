@@ -13,6 +13,15 @@ run from its official Docker image, and (on confirmation) create tickets in the 
 > touches the target directly** (zone transfers, cert grabs, brute force). Confirm authorization
 > before using active mode.
 
+## Parallelize with subagents
+
+When scanning **several domains**, fan out subagents (launch several in ONE message) — one per
+target domain (or netblock) — to enumerate and do follow-up analysis in parallel, then merge the
+subdomain inventories into one report.
+
+Do **not** fan out the Jira ticket-creation step — one agent files tickets after your
+confirmation to avoid duplicates.
+
 ## Step 1 — Ask for scope, then verify preconditions
 
 1. **Ask the user before scanning** (AskUserQuestion or a direct question):
