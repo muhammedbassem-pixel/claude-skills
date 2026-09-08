@@ -15,9 +15,37 @@ and per-language review guide — use it to drive the manual pass.
 
 ## Step 1 — Ask for scope, then verify preconditions
 
-1. **Ask the user for the source path on disk** (AskUserQuestion or a direct question) — do not
-   assume the cwd. Confirm the path exists. Optionally ask which languages/areas to focus on.
-2. Verify tooling: Docker daemon running (`docker info`) and `jq`.
+1. **Ask the user what to review** (AskUserQuestion or a direct question):
+   - a **single codebase** on disk — confirm the path exists (do not assume the cwd), or
+   - **all repositories in an org/group** — clone and scan each one by one (see Step 2b).
+   Optionally ask which languages/areas to focus on.
+2. Verify tooling: Docker daemon running (`docker info`) and `jq`. For org scans also `git`, and
+   `gh` (authenticated) when enumerating a GitHub org.
+
+## Step 2b — Scan every repo in an org (bulk mode)
+
+To review a whole org/group, run the bulk script — it enumerates repositories, clones each
+(shallow by default), runs `review.sh` on it, and writes an aggregate `summary.md` with
+per-repo severity counts. Invoke by full path:
+
+```bash
+# GitHub org/user (uses gh; must be authenticated)
+bash "<this-skill-dir>/scripts/scan-org.sh" <github-org>
+
+# Any git host — a file with one clone URL per line (GitHub/GitLab/Bitbucket/self-hosted)
+bash "<this-skill-dir>/scripts/scan-org.sh" -f clone-urls.txt
+```
+
+Options: `-l <n>` limit repos (GitHub mode), `-o <dir>` output dir, `-k` keep full clones
+(default is shallow `--depth 1`, deleted after each scan to save space).
+
+Output goes to `~/code-review/<org>_ORGSCAN_<datetime>/`:
+- `summary.md` — table of every repo with Error/Warning/Info/Total counts and a link to its report
+- `reports/<repo>/` — the full `review.sh` output (`semgrep.sarif`, `semgrep.json`, …) per repo
+
+After the run, read `summary.md`, then open the per-repo reports for the repos with the most
+(or highest-severity) findings and triage them as in Step 3. Then continue to the single-repo
+scan below only if you also want to deep-dive one codebase.
 
 ## Step 2 — Run automated SAST
 

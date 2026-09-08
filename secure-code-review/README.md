@@ -47,16 +47,36 @@ In Claude Code, ask e.g.:
 - "do a secure code review of this repo"
 - "run a SAST scan on ~/git/api and check OWASP Top 10"
 - "security-review the Flutter app and open Jira tickets for criticals"
+- "pull all our org repos and scan them one by one"
 
 ### Running the scanner directly
+
+Single codebase:
 
 ```bash
 bash secure-code-review/scripts/review.sh [-o output-dir] <source-dir>
 ```
 
-| Env | Default | Purpose |
-|-----|---------|---------|
+All repos in an org/group (clones each and scans one by one, then aggregates):
+
+```bash
+# GitHub org/user (uses gh; must be authenticated)
+bash secure-code-review/scripts/scan-org.sh <github-org>
+
+# Any git host — a file with one clone URL per line
+bash secure-code-review/scripts/scan-org.sh -f clone-urls.txt
+```
+
+| Option / env | Default | Purpose |
+|--------------|---------|---------|
+| `-l <n>` | `200` | Limit number of repos (GitHub mode) |
+| `-o <dir>` | `~/code-review/<org>_ORGSCAN_<datetime>` | Output directory |
+| `-k` | off | Keep full clones (default: shallow, deleted after each scan) |
 | `SEMGREP_IMAGE` | `semgrep/semgrep:latest` | Pin a specific image/tag |
+
+The org scan writes `summary.md` (per-repo Error/Warning/Info/Total counts) plus a full
+`reports/<repo>/` directory for each repository. Org mode needs `git`, and `gh` (authenticated)
+for GitHub enumeration; the `-f` URL-file mode works with any host (GitLab/Bitbucket/self-hosted).
 
 ## Notes
 
@@ -75,5 +95,6 @@ secure-code-review/
 ├── references/
 │   └── checklist.md      # OWASP Top 10 + CWE Top 25 review guide, per-language
 └── scripts/
-    └── review.sh         # pull Semgrep -> SAST (+ dart analyze) -> severity summary
+    ├── review.sh         # pull Semgrep -> SAST (+ dart analyze) -> severity summary
+    └── scan-org.sh       # enumerate + clone all org repos, review each, aggregate summary.md
 ```
