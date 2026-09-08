@@ -81,7 +81,7 @@ for url in "${URLS[@]}"; do
   dest="$CLONES/$name"
   rm -rf "$dest"
   if [ "$KEEP" = 1 ]; then CLONE_ARGS=(); else CLONE_ARGS=(--depth 1); fi
-  if ! git clone --quiet "${CLONE_ARGS[@]}" "$url" "$dest" 2>"$OUT/${name}.clone.log"; then
+  if ! git clone --quiet "${CLONE_ARGS[@]+"${CLONE_ARGS[@]}"}" "$url" "$dest" 2>"$OUT/${name}.clone.log"; then
     echo ">> clone FAILED (see ${name}.clone.log) — skipping"
     echo "| $i | $name | - | - | - | - | clone failed |" >> "$SUMMARY"
     continue

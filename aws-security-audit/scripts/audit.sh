@@ -55,11 +55,11 @@ docker pull "$PROWLER_IMAGE" || echo "(pull failed — using cached image if pre
 
 echo ">> Running Prowler (regions: $REGIONS${SEVERITIES:+, severities: $SEVERITIES})..."
 docker run --rm \
-  "${CRED_ARGS[@]}" \
+  "${CRED_ARGS[@]+"${CRED_ARGS[@]}"}" \
   -v "$OUT:/home/prowler/output" \
   "$PROWLER_IMAGE" aws \
-  "${REGION_ARGS[@]}" \
-  "${SEV_ARGS[@]}" \
+  "${REGION_ARGS[@]+"${REGION_ARGS[@]}"}" \
+  "${SEV_ARGS[@]+"${SEV_ARGS[@]}"}" \
   -M csv json-ocsf html \
   -F "prowler-${ACCOUNT}-${TS}" \
   -z

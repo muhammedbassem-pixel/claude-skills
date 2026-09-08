@@ -46,7 +46,7 @@ echo ">> Enumerating $DOMAINS (timeout ${TIMEOUT}m)..."
 docker run --rm \
   -v "$OUT:/data" \
   "$AMASS_IMAGE" \
-  enum -d "$DOMAINS" -timeout "$TIMEOUT" -dir /data "${MODE_ARGS[@]}" || true
+  enum -d "$DOMAINS" -timeout "$TIMEOUT" -dir /data "${MODE_ARGS[@]+"${MODE_ARGS[@]}"}" || true
 
 echo ">> Extracting discovered subdomains..."
 docker run --rm \
