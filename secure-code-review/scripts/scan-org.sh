@@ -88,7 +88,9 @@ for url in "${URLS[@]}"; do
   fi
 
   repdir="$REPORTS/$name"
-  bash "$REVIEW" -o "$repdir" "$dest" || echo ">> review.sh returned non-zero for $name (continuing)"
+  # REPO_NAME tags every finding with its repository (used in findings.json / findings.md)
+  REPO_NAME="$name" bash "$REVIEW" -o "$repdir" "$dest" \
+    || echo ">> review.sh returned non-zero for $name (continuing)"
 
   # per-repo severity counts from semgrep.json
   json="$repdir/semgrep.json"
@@ -97,7 +99,7 @@ for url in "${URLS[@]}"; do
     wrn=$(jq '[.results[]|select(.extra.severity=="WARNING")]|length' "$json" 2>/dev/null || echo 0)
     inf=$(jq '[.results[]|select(.extra.severity=="INFO")]|length' "$json" 2>/dev/null || echo 0)
     tot=$(jq '.results|length' "$json" 2>/dev/null || echo 0)
-    echo "| $i | $name | $err | $wrn | $inf | $tot | reports/$name/ |" >> "$SUMMARY"
+    echo "| $i | $name | $err | $wrn | $inf | $tot | reports/$name/findings.md |" >> "$SUMMARY"
   else
     echo "| $i | $name | ? | ? | ? | ? | reports/$name/ (no json) |" >> "$SUMMARY"
   fi
@@ -105,6 +107,39 @@ for url in "${URLS[@]}"; do
   [ "$KEEP" = 1 ] || rm -rf "$dest"
 done
 
+# ---- aggregate findings grouped by repo (ticket-ready) ----
+AGG_JSON="$OUT/findings.json"          # { "<repo>": [ {finding…}, … ], … }
+AGG_MD="$OUT/findings-by-repo.md"
+# merge every per-repo findings.json into one object keyed by repo name
+jq -s 'map(select(length>0)) | map({ (.[0].repo): . }) | add // {}' \
+  "$REPORTS"/*/findings.json > "$AGG_JSON" 2>/dev/null || echo '{}' > "$AGG_JSON"
+
+{
+  echo "# Findings by repository — $LABEL"
+  echo
+  echo "Grouped for ticket creation. Each finding: severity, rule, file:line, OWASP/CWE, message."
+  echo
+  for repdir in "$REPORTS"/*/; do
+    rname="$(basename "$repdir")"
+    f="$repdir/findings.json"
+    [ -s "$f" ] || continue
+    n=$(jq 'length' "$f" 2>/dev/null || echo 0)
+    echo "## $rname — $n finding(s)"
+    echo
+    if [ "$n" -gt 0 ]; then
+      echo "| Severity | Rule | File:Line | OWASP / CWE | Message |"
+      echo "|----------|------|-----------|-------------|---------|"
+      jq -r '.[] | "| \(.severity) | \(.rule) | \(.file):\(.start_line) | \((.owasp + .cwe) | join(", ") | .[0:60]) | \(.message | gsub("\n";" ") | gsub("\\|";"\\|") | .[0:140]) |"' "$f" 2>/dev/null || true
+    else
+      echo "_No findings._"
+    fi
+    echo
+  done
+} > "$AGG_MD"
+
 echo
-echo ">> Done. Aggregate summary: $SUMMARY"
-echo ">> Per-repo reports under: $REPORTS/"
+echo ">> Done."
+echo ">> Aggregate summary (counts):   $SUMMARY"
+echo ">> Findings grouped by repo:     $AGG_MD"
+echo ">> Findings as JSON (for tickets): $AGG_JSON"
+echo ">> Per-repo reports under:        $REPORTS/"

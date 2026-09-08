@@ -40,12 +40,17 @@ Options: `-l <n>` limit repos (GitHub mode), `-o <dir>` output dir, `-k` keep fu
 (default is shallow `--depth 1`, deleted after each scan to save space).
 
 Output goes to `~/code-review/<org>_ORGSCAN_<datetime>/`:
-- `summary.md` — table of every repo with Error/Warning/Info/Total counts and a link to its report
-- `reports/<repo>/` — the full `review.sh` output (`semgrep.sarif`, `semgrep.json`, …) per repo
+- `summary.md` — table of every repo with Error/Warning/Info/Total counts
+- `findings-by-repo.md` — **every finding grouped under its repo name** (severity, rule,
+  file:line, OWASP/CWE, message) — read this to open tickets per repo
+- `findings.json` — the same, machine-readable as `{ "<repo>": [ {finding…}, … ] }` — iterate
+  this to create one Jira ticket per finding (or per repo) in Step 4
+- `reports/<repo>/` — full `review.sh` output per repo (`findings.md`, `findings.json`,
+  `semgrep.sarif`, `semgrep.json`, …)
 
-After the run, read `summary.md`, then open the per-repo reports for the repos with the most
-(or highest-severity) findings and triage them as in Step 3. Then continue to the single-repo
-scan below only if you also want to deep-dive one codebase.
+After the run, read `summary.md` to see which repos are worst, then use `findings.json` /
+`findings-by-repo.md` to triage (Step 3) and file tickets (Step 4) — the findings are already
+tagged with their repo name, so tickets can reference the exact repository, file, and line.
 
 ## Step 2 — Run automated SAST
 
@@ -99,7 +104,12 @@ Notes:
 
 **Always confirm with the user before creating tickets**, and ask which granularity:
 - **One ticket per confirmed vulnerability** (recommended, at least for high/critical), or
+- **One ticket per repository** bundling that repo's findings, or
 - **One summary ticket** with the findings table.
+
+For an org scan, drive ticket creation from `findings.json` (`{ "<repo>": [ … ] }`) — each
+finding already carries `repo`, `severity`, `rule`, `file`, `start_line`, `owasp`, and `cwe`,
+so a ticket can name the exact repository, file, and line. Iterate repo by repo.
 
 ### Preferred: Atlassian MCP tools
 

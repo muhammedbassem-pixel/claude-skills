@@ -74,9 +74,15 @@ bash secure-code-review/scripts/scan-org.sh -f clone-urls.txt
 | `-k` | off | Keep full clones (default: shallow, deleted after each scan) |
 | `SEMGREP_IMAGE` | `semgrep/semgrep:latest` | Pin a specific image/tag |
 
-The org scan writes `summary.md` (per-repo Error/Warning/Info/Total counts) plus a full
-`reports/<repo>/` directory for each repository. Org mode needs `git`, and `gh` (authenticated)
-for GitHub enumeration; the `-f` URL-file mode works with any host (GitLab/Bitbucket/self-hosted).
+The org scan writes, under `~/code-review/<org>_ORGSCAN_<datetime>/`:
+- `summary.md` — per-repo Error/Warning/Info/Total counts
+- `findings-by-repo.md` — every finding grouped under its repo name (severity, rule, file:line,
+  OWASP/CWE, message) — ready to open tickets from
+- `findings.json` — the same as `{ "<repo>": [ {finding…}, … ] }` for driving ticket creation
+- `reports/<repo>/` — full per-repo output (`findings.md`, `findings.json`, `semgrep.sarif`, …)
+
+Org mode needs `git`, and `gh` (authenticated) for GitHub enumeration; the `-f` URL-file mode
+works with any host (GitLab/Bitbucket/self-hosted).
 
 ## Notes
 

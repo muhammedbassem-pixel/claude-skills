@@ -90,6 +90,43 @@ else
   echo "   (no semgrep JSON produced — check output above)"
 fi
 
+# Ticket-ready findings: normalized JSON + a human-readable markdown table.
+# REPO_NAME (optional, set by scan-org.sh) tags each finding with its repository.
+REPO_NAME="${REPO_NAME:-$NAME}"
+FINDINGS_JSON="$OUT/findings.json"
+FINDINGS_MD="$OUT/findings.md"
+if [ -s "$JSON" ]; then
+  jq --arg repo "$REPO_NAME" '[.results[] | {
+      repo: $repo,
+      severity: .extra.severity,
+      rule: (.check_id | split(".") | last),
+      check_id: .check_id,
+      file: (.path | ltrimstr("/src/")),
+      start_line: .start.line,
+      end_line: .end.line,
+      message: .extra.message,
+      owasp: (.extra.metadata.owasp // []),
+      cwe: (.extra.metadata.cwe // []),
+      reference: (.extra.metadata.references // [])
+    }] | sort_by(.severity) | reverse' "$JSON" > "$FINDINGS_JSON" 2>/dev/null || echo '[]' > "$FINDINGS_JSON"
+else
+  echo '[]' > "$FINDINGS_JSON"
+fi
+
+{
+  echo "# Findings — $REPO_NAME"
+  echo
+  echo "Total: $(jq 'length' "$FINDINGS_JSON" 2>/dev/null || echo 0) "
+  echo "(ERROR: $(jq '[.[]|select(.severity=="ERROR")]|length' "$FINDINGS_JSON" 2>/dev/null || echo 0), "\
+"WARNING: $(jq '[.[]|select(.severity=="WARNING")]|length' "$FINDINGS_JSON" 2>/dev/null || echo 0), "\
+"INFO: $(jq '[.[]|select(.severity=="INFO")]|length' "$FINDINGS_JSON" 2>/dev/null || echo 0))"
+  echo
+  echo "| Severity | Rule | File:Line | OWASP / CWE | Message |"
+  echo "|----------|------|-----------|-------------|---------|"
+  jq -r '.[] | "| \(.severity) | \(.rule) | \(.file):\(.start_line) | \((.owasp + .cwe) | join(", ") | .[0:60]) | \(.message | gsub("\n";" ") | gsub("\\|";"\\|") | .[0:140]) |"' \
+    "$FINDINGS_JSON" 2>/dev/null || true
+} > "$FINDINGS_MD"
+
 echo
 echo ">> Reports written to $OUT:"
 ls -1 "$OUT" | sed 's/^/   /'
